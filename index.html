@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LibraFlow — Library Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root {
+  --navy: #0b1f4b;
+  --navy2: #122660;
+  --blue: #1a56db;
+  --blue-lt: #3b71f8;
+  --accent: #00b4d8;
+  --accent2: #0096c7;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --orange: #f97316;
+  --red: #ef4444;
+  --purple: #8b5cf6;
+  --bg: #f0f4ff;
+  --surface: #ffffff;
+  --surface2: #f8faff;
+  --border: #dde6ff;
+  --text: #0f1e45;
+  --text2: #4a5a8a;
+  --text3: #8895b3;
+  --sidebar-w: 240px;
+  --top-h: 64px;
+  --r: 14px;
+  --r-sm: 8px;
+  --shadow: 0 2px 16px rgba(26,86,219,0.09);
+  --shadow-md: 0 8px 32px rgba(26,86,219,0.13);
+  --shadow-lg: 0 20px 60px rgba(26,86,219,0.18);
+  --transition: 0.22s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;background:var(--navy);
+  min-height:100vh;display:flex;flex-direction:column;
+  position:fixed;left:0;top:0;bottom:0;z-index:200;
+  transition:transform var(--transition);
+}
+.sidebar-logo{
+  padding:22px 22px 18px;border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;gap:11px;
+}
+
+.logo-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue-lt),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:#fff;flex-shrink:0;
+}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.25rem;color:#fff;line-height:1}
+.logo-text em{color:var(--accent);font-style:italic}
+.logo-sub{font-size:0.68rem;color:rgba(255,255,255,0.4);margin-top:2px;letter-spacing:.04em}
+.nav-section{padding:18px 12px 6px;font-size:0.68rem;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,0.3);text-transform:uppercase}
+.nav-item{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 14px;margin:2px 10px;border-radius:10px;
+  color:rgba(255,255,255,0.6);font-size:0.875rem;font-weight:500;
+  cursor:pointer;transition:all var(--transition);text-decoration:none;
+  border:none;background:none;width:calc(100% - 20px);text-align:left;
+}
+.nav-item i{width:18px;text-align:center;font-size:0.95rem;flex-shrink:0}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff}
+.nav-item.active{background:linear-gradient(90deg,rgba(26,86,219,0.9),rgba(0,180,216,0.7));color:#fff;box-shadow:0 4px 16px rgba(26,86,219,0.35)}
+.nav-item.active i{color:var(--accent)}
+.sidebar-footer{
+  margin-top:auto;padding:16px;border-top:1px solid rgba(255,255,255,0.07);
+}
+.sidebar-footer-text{font-size:0.72rem;color:rgba(255,255,255,0.3);text-align:center}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{
+  height:var(--top-h);background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 8px rgba(26,86,219,0.06);
+}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.page-breadcrumb{font-size:0.8rem;color:var(--text3)}
+.page-title-top{font-size:1rem;font-weight:700;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{
+  width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text2);font-size:0.9rem;transition:all var(--transition);
+}
+.topbar-btn:hover{border-color:var(--blue);color:var(--blue)}
+.user-badge{
+  display:flex;align-items:center;gap:9px;padding:5px 12px 5px 5px;
+  border-radius:50px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;
+}
+.user-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue-lt),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:700;color:#fff;
+}
+.user-name{font-size:0.82rem;font-weight:600;color:var(--text)}
+.menu-toggle{
+  display:none;background:none;border:none;cursor:pointer;
+  color:var(--text);font-size:1.2rem;padding:6px;
+}
+
+/* ── PAGES ── */
+.page{display:none;padding:28px;animation:fadeUp .3s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PAGE HEADER ── */
+.pg-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px}
+.pg-header-left h2{font-family:'Playfair Display',serif;font-size:1.75rem;color:var(--navy);line-height:1.2}
+.pg-header-left p{font-size:0.875rem;color:var(--text3);margin-top:4px}
+.pg-header-right{display:flex;align-items:center;gap:10px}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:10px;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.875rem;font-weight:600;
+  cursor:pointer;transition:all var(--transition);white-space:nowrap;
+}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(26,86,219,0.3)}
+.btn-primary:hover{background:#1447c0;box-shadow:0 6px 20px rgba(26,86,219,0.4)}
+.btn-outline{background:var(--surface);color:var(--blue);border:1.5px solid var(--blue);box-shadow:none}
+.btn-outline:hover{background:var(--bg)}
+.btn-danger{background:var(--red);color:#fff;box-shadow:0 4px 14px rgba(239,68,68,0.25)}
+.btn-danger:hover{background:#dc2626}
+.btn-sm{padding:7px 14px;font-size:0.8rem;border-radius:8px}
+
+/* ── ICON BUTTONS ── */
+.ibtn{
+  width:34px;height:34px;border-radius:8px;border:none;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:0.8rem;transition:all var(--transition);
+}
+.ibtn:active{transform:scale(0.9)}
+.ibtn-edit{background:#eff6ff;color:var(--blue)}
+.ibtn-edit:hover{background:#dbeafe}
+.ibtn-del{background:#fef2f2;color:var(--red)}
+.ibtn-del:hover{background:#fee2e2}
+.ibtn-issue{background:#fff7ed;color:var(--orange)}
+.ibtn-issue:hover{background:#ffedd5}
+.ibtn-return{background:#f0fdf4;color:var(--green)}
+.ibtn-return:hover{background:#dcfce7}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow)}
+.card-header{
+  padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-header h3{font-size:0.95rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.card-header h3 i{color:var(--blue);font-size:0.875rem}
+.card-body{padding:22px}
+
+/* ── HOME PAGE ── */
+.hero-banner{
+  background:linear-gradient(135deg,var(--navy) 0%,#1a3a7c 50%,#1a5ab8 100%);
+  border-radius:var(--r);padding:42px 48px;margin-bottom:24px;
+  display:flex;align-items:center;justify-content:space-between;gap:32px;
+  position:relative;overflow:hidden;
+}
+.hero-banner::before{
+  content:'';position:absolute;width:400px;height:400px;
+  border-radius:50%;background:rgba(0,180,216,0.08);
+  top:-150px;right:-80px;pointer-events:none;
+}
+.hero-banner::after{
+  content:'';position:absolute;width:200px;height:200px;
+  border-radius:50%;background:rgba(255,255,255,0.04);
+  bottom:-80px;left:300px;pointer-events:none;
+}
+.hero-text{position:relative;z-index:1}
+.hero-eyebrow{
+  font-size:0.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:12px;
+}
+.hero-text h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,4vw,2.8rem);color:#fff;line-height:1.15;margin-bottom:14px;
+}
+.hero-text h1 em{color:#90e0ef;font-style:italic}
+.hero-text p{font-size:0.95rem;color:rgba(255,255,255,0.65);max-width:420px;line-height:1.7;margin-bottom:24px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.hero-visual{flex-shrink:0;position:relative;z-index:1}
+.book-visual{display:flex;align-items:flex-end;gap:7px;height:130px}
+.bk{border-radius:5px 10px 10px 5px;opacity:.85;animation:bkfloat 3s ease-in-out infinite}
+.bk1{width:24px;height:76px;background:#90e0ef;animation-delay:0s}
+.bk2{width:28px;height:110px;background:#48cae4;animation-delay:.25s}
+.bk3{width:32px;height:90px;background:#00b4d8;animation-delay:.5s}
+.bk4{width:26px;height:120px;background:#0096c7;animation-delay:.75s}
+.bk5{width:22px;height:82px;background:#0077b6;animation-delay:1s}
+@keyframes bkfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:24px}
+.feat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:22px;transition:all var(--transition);
+}
+.feat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:rgba(26,86,219,0.2)}
+.feat-icon{
+  width:46px;height:46px;border-radius:12px;margin-bottom:14px;
+  display:flex;align-items:center;justify-content:center;font-size:1.15rem;
+}
+.fi-blue{background:#eff6ff;color:var(--blue)}
+.fi-cyan{background:#ecfeff;color:#0891b2}
+.fi-green{background:#f0fdf4;color:var(--green)}
+.fi-orange{background:#fff7ed;color:var(--orange)}
+.feat-card h3{font-size:0.92rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+.feat-card p{font-size:0.82rem;color:var(--text3);line-height:1.6}
+.quick-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.qa{
+  display:flex;align-items:center;gap:10px;padding:14px 18px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  cursor:pointer;transition:all var(--transition);flex:1;min-width:160px;
+}
+.qa:hover{border-color:var(--blue);box-shadow:var(--shadow)}
+.qa-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.qa-text strong{display:block;font-size:0.85rem;font-weight:700;color:var(--text)}
+.qa-text span{font-size:0.75rem;color:var(--text3)}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px 22px;display:flex;align-items:center;gap:16px;
+  transition:all var(--transition);box-shadow:var(--shadow);
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.si-blue{background:#eff6ff;color:var(--blue)}
+.si-green{background:#f0fdf4;color:var(--green)}
+.si-orange{background:#fff7ed;color:var(--orange)}
+.si-purple{background:#f5f3ff;color:var(--purple)}
+.stat-info h3{font-size:1.9rem;font-weight:700;line-height:1;color:var(--text);font-family:'Playfair Display',serif}
+.stat-info p{font-size:0.78rem;color:var(--text3);margin-top:3px}
+.stat-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:50px;margin-top:5px}
+.sb-up{background:#f0fdf4;color:var(--green)}
+.sb-down{background:#fef2f2;color:var(--red)}
+
+/* ── DASHBOARD GRID ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cat-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.cat-item:last-child{border-bottom:none}
+.cat-name{font-size:0.87rem;font-weight:600;color:var(--text);min-width:100px}
+.cat-bar-bg{flex:1;height:6px;background:var(--bg);border-radius:99px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--accent));transition:width .6s ease}
+.cat-num{font-size:0.85rem;font-weight:700;color:var(--blue);min-width:22px;text-align:right}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.ad-add{background:var(--green)}.ad-del{background:var(--red)}
+.ad-edit{background:var(--blue)}.ad-issue{background:var(--orange)}.ad-return{background:var(--purple)}
+.act-msg{font-size:0.85rem;color:var(--text);flex:1;line-height:1.5}
+.act-time{font-size:0.72rem;color:var(--text3);flex-shrink:0;white-space:nowrap}
+.no-data{font-size:0.85rem;color:var(--text3);padding:12px 0}
+
+/* ── SEARCH BAR ── */
+.search-wrap{position:relative;margin-bottom:18px}
+.search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:0.9rem;pointer-events:none}
+.search-input{
+  width:100%;padding:11px 42px;
+  border:1.5px solid var(--border);border-radius:10px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;
+  color:var(--text);background:var(--surface);outline:none;
+  transition:border-color var(--transition),box-shadow var(--transition);
+}
+.search-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,0.1)}
+.search-clear{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--text3);
+  font-size:0.9rem;display:none;padding:4px;border-radius:50%;
+  transition:color var(--transition);
+}
+.search-clear.vis{display:block}
+.search-clear:hover{color:var(--text)}
+
+/* ── FILTER PILLS ── */
+.pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+.pill{
+  padding:5px 14px;border-radius:50px;border:1.5px solid var(--border);
+  background:var(--surface);font-size:0.78rem;font-weight:600;color:var(--text2);
+  cursor:pointer;transition:all var(--transition);
+}
+.pill:hover{border-color:var(--blue);color:var(--blue)}
+.pill.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ── TABLE ── */
+.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+thead{background:var(--surface2)}
+th{
+  padding:13px 16px;text-align:left;font-size:0.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;color:var(--text3);
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+td{padding:13px 16px;font-size:0.875rem;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background var(--transition)}
+tbody tr:hover td{background:#f4f7ff}
+.td-title{font-weight:700;color:var(--text)}
+.td-author{color:var(--text2)}
+.td-num{font-weight:700;font-size:0.95rem}
+.num-avail{color:var(--green)}
+.num-none{color:var(--red)}
+.num-issue{color:var(--orange)}
+.btns{display:flex;gap:6px}
+
+/* ── STATUS BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:50px;font-size:0.73rem;font-weight:700}
+.bdg-ok{background:#f0fdf4;color:#15803d}
+.bdg-partial{background:#fff7ed;color:#c2410c}
+.bdg-none{background:#fef2f2;color:#dc2626}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:52px 24px;color:var(--text3)}
+.empty-state i{font-size:2.8rem;display:block;margin-bottom:12px;color:var(--border)}
+.empty-state p{font-size:0.9rem;margin-bottom:18px}
+
+/* ── MODAL ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(11,31,75,0.55);
+  backdrop-filter:blur(5px);display:flex;align-items:center;
+  justify-content:center;z-index:1000;opacity:0;pointer-events:none;
+  transition:opacity .25s ease;padding:16px;
+}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--surface);border-radius:20px;width:100%;max-width:500px;
+  box-shadow:var(--shadow-lg);transform:scale(.93) translateY(16px);
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1);
+}
+.overlay.open .modal{transform:scale(1) translateY(0)}
+.modal-sm{max-width:380px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--border)}
+.modal-head h3{font-size:1.05rem;font-weight:700;display:flex;align-items:center;gap:9px;color:var(--text)}
+.modal-head h3 i{color:var(--blue)}
+.modal-head.danger{background:#fef2f2;border-radius:20px 20px 0 0}
+.modal-head.danger h3{color:var(--red)}
+.modal-head.danger h3 i{color:var(--red)}
+.mclose{
+  width:32px;height:32px;border-radius:50%;border:none;background:var(--bg);
+  cursor:pointer;color:var(--text3);font-size:0.9rem;
+  display:flex;align-items:center;justify-content:center;transition:all var(--transition);
+}
+.mclose:hover{background:var(--border);color:var(--text)}
+.modal-body{padding:24px}
+.modal-body p{font-size:0.9rem;color:var(--text2);line-height:1.7}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px 22px;border-top:1px solid var(--border)}
+
+/* ── FORM ── */
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:0.8rem;font-weight:700;color:var(--text2);margin-bottom:5px}
+.req{color:var(--red)}
+.fg input,.fg select{
+  width:100%;padding:10px 13px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;
+  color:var(--text);background:var(--surface2);outline:none;
+  transition:border-color var(--transition),box-shadow var(--transition);
+}
+.fg input:focus,.fg select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,0.1);background:var(--surface)}
+.fg input.err,.fg select.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,0.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:28px;right:28px;
+  background:var(--navy);color:#fff;
+  padding:13px 20px;border-radius:12px;
+  display:flex;align-items:center;gap:10px;
+  font-size:0.875rem;font-weight:500;
+  box-shadow:var(--shadow-lg);
+  transform:translateY(90px);opacity:0;
+  transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .32s ease;
+  z-index:9999;max-width:320px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-icon{font-size:1rem}
+.t-success .toast-icon{color:#4ade80}
+.t-error   .toast-icon{color:#f87171}
+.t-warn    .toast-icon{color:#fbbf24}
+.toast-bar{
+  position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 12px 12px;
+  background:linear-gradient(90deg,var(--blue),var(--accent));
+  width:100%;transform-origin:left;
+}
+
+/* ── MOBILE ── */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:199}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .main{margin-left:0}
+  .menu-toggle{display:block}
+  .dash-grid{grid-template-columns:1fr}
+  .hero-visual{display:none}
+  .hero-banner{padding:28px 28px}
+}
+@media(max-width:600px){
+  .page{padding:16px}
+  .topbar{padding:0 16px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .hero-banner{padding:22px 20px}
+  .hero-text h1{font-size:1.6rem}
+  .quick-actions{flex-direction:column}
+  .toast{bottom:16px;right:16px;left:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fa-solid fa-book-open-reader"></i></div>
+    <div>
+      <div class="logo-text">Libra<em>Flow</em></div>
+      <div class="logo-sub">Library Management</div>
+    </div>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <button class="nav-item active" data-page="home"><i class="fa-solid fa-house"></i> Home</button>
+  <button class="nav-item" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+
+  <div class="nav-section">Library</div>
+  <button class="nav-item" data-page="books"><i class="fa-solid fa-book"></i> Books</button>
+  <button class="nav-item" data-page="issue"><i class="fa-solid fa-arrow-right-arrow-left"></i> Issue / Return</button>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-footer-text">LibraFlow v2.0 &bull; localStorage</div>
+  </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+      <div>
+        <div class="page-breadcrumb">LibraFlow</div>
+        <div class="page-title-top" id="topbarTitle">Home</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-btn" title="Notifications"><i class="fa-solid fa-bell"></i></div>
+      <div class="user-badge">
+        <div class="user-avatar">LF</div>
+        <span class="user-name">Librarian</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= HOME ============================= -->
+  <section class="page active" id="page-home">
+    <div class="hero-banner">
+      <div class="hero-text">
+        <div class="hero-eyebrow"><i class="fa-solid fa-sparkles"></i> Welcome to LibraFlow</div>
+        <h1>Your Smart <em>Library,</em><br/>Fully Digital.</h1>
+        <p>Manage books, track issues & returns, monitor your collection — all in one beautiful, fast interface.</p>
+        <div class="hero-btns">
+          <button class="btn btn-primary" onclick="nav('books')"><i class="fa-solid fa-plus"></i> Add Book</button>
+          <button class="btn" style="background:rgba(255,255,255,0.12);color:#fff;border:1.5px solid rgba(255,255,255,0.25)" onclick="nav('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="book-visual">
+          <div class="bk bk1"></div><div class="bk bk2"></div>
+          <div class="bk bk3"></div><div class="bk bk4"></div><div class="bk bk5"></div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:0.78rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);margin-bottom:14px">Quick Actions</p>
+    <div class="quick-actions">
+      <div class="qa" onclick="nav('books')">
+        <div class="qa-icon fi-blue"><i class="fa-solid fa-book-medical"></i></div>
+        <div class="qa-text"><strong>Add New Book</strong><span>Add to collection</span></div>
+      </div>
+      <div class="qa" onclick="nav('issue')">
+        <div class="qa-icon fi-orange"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+        <div class="qa-text"><strong>Issue a Book</strong><span>Lend to student</span></div>
+      </div>
+      <div class="qa" onclick="nav('issue')">
+        <div class="qa-icon fi-green"><i class="fa-solid fa-rotate-left"></i></div>
+        <div class="qa-text"><strong>Return a Book</strong><span>Process return</span></div>
+      </div>
+      <div class="qa" onclick="nav('dashboard')">
+        <div class="qa-icon" style="background:#f5f3ff;color:var(--purple)"><i class="fa-solid fa-chart-bar"></i></div>
+        <div class="qa-text"><strong>View Reports</strong><span>Library stats</span></div>
+      </div>
+    </div>
+
+    <p style="font-size:0.78rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);margin-bottom:14px">Features</p>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon fi-blue"><i class="fa-solid fa-book"></i></div><h3>Book Management</h3><p>Add, edit, delete books with full details. Real-time quantity tracking.</p></div>
+      <div class="feat-card"><div class="feat-icon fi-cyan"><i class="fa-solid fa-magnifying-glass"></i></div><h3>Instant Search</h3><p>Search by title or author with live filtering and category tabs.</p></div>
+      <div class="feat-card"><div class="feat-icon fi-green"><i class="fa-solid fa-arrows-rotate"></i></div><h3>Issue & Return</h3><p>One-click issue and return. Quantities update automatically.</p></div>
+      <div class="feat-card"><div class="feat-icon fi-orange"><i class="fa-solid fa-database"></i></div><h3>Offline Ready</h3><p>All data persists via localStorage — works completely offline.</p></div>
+    </div>
+  </section>
+
+  <!-- ============================= DASHBOARD ============================= -->
+  <section class="page" id="page-dashboard">
+    <div class="pg-header">
+      <div class="pg-header-left">
+        <h2>Dashboard</h2>
+        <p>Library overview and statistics</p>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon si-blue"><i class="fa-solid fa-book"></i></div><div class="stat-info"><h3 id="stTotal">0</h3><p>Book Titles</p></div></div>
+      <div class="stat-card"><div class="stat-icon si-green"><i class="fa-solid fa-layer-group"></i></div><div class="stat-info"><h3 id="stCopies">0</h3><p>Total Copies</p></div></div>
+      <div class="stat-card"><div class="stat-icon si-orange"><i class="fa-solid fa-book-open"></i></div><div class="stat-info"><h3 id="stIssued">0</h3><p>Issued</p></div></div>
+      <div class="stat-card"><div class="stat-icon si-purple"><i class="fa-solid fa-circle-check"></i></div><div class="stat-info"><h3 id="stAvail">0</h3><p>Available</p></div></div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-header"><h3><i class="fa-solid fa-tag"></i> Books by Category</h3></div>
+        <div class="card-body" id="catList"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h3></div>
+        <div class="card-body" style="max-height:300px;overflow-y:auto" id="actLog"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= BOOKS ============================= -->
+  <section class="page" id="page-books">
+    <div class="pg-header">
+      <div class="pg-header-left">
+        <h2>Books</h2>
+        <p>Manage your library collection</p>
+      </div>
+      <div class="pg-header-right">
+        <button class="btn btn-primary" id="openAdd"><i class="fa-solid fa-plus"></i> Add Book</button>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input class="search-input" id="srch" placeholder="Search by title or author…" autocomplete="off"/>
+      <button class="search-clear" id="srchClear"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="pills" id="pills"></div>
+
+    <div class="tbl-wrap" id="booksWrap">
+      <table>
+        <thead><tr><th>#</th><th>Title</th><th>Author</th><th>Category</th><th>Total</th><th>Available</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="bTbody"></tbody>
+      </table>
+      <div class="empty-state" id="bEmpty" style="display:none">
+        <i class="fa-solid fa-book-open"></i>
+        <p>No books found. Add your first book!</p>
+        <button class="btn btn-primary btn-sm" id="emptyAdd"><i class="fa-solid fa-plus"></i> Add Book</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= ISSUE/RETURN ============================= -->
+  <section class="page" id="page-issue">
+    <div class="pg-header">
+      <div class="pg-header-left">
+        <h2>Issue / Return</h2>
+        <p>Manage book lending and returns</p>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input class="search-input" id="isrch" placeholder="Search book to issue or return…" autocomplete="off"/>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Title</th><th>Author</th><th>Category</th><th>Available</th><th>Issued</th><th>Action</th></tr></thead>
+        <tbody id="iTbody"></tbody>
+      </table>
+      <div class="empty-state" id="iEmpty" style="display:none">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <p>No books found.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="tIcon"></span>
+  <span id="tMsg">Done!</span>
+  <div class="toast-bar"></div>
+</div>
+
+<!-- ── ADD/EDIT MODAL ── -->
+<div class="overlay" id="bookOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-book"></i> <span id="mTitle">Add New Book</span></h3>
+      <button class="mclose" id="mClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId"/>
+      <div class="fg"><label>Book Title <span class="req">*</span></label><input id="fTitle" placeholder="e.g. The Alchemist"/></div>
+      <div class="fg"><label>Author <span class="req">*</span></label><input id="fAuthor" placeholder="e.g. Paulo Coelho"/></div>
+      <div class="form-row">
+        <div class="fg">
+          <label>Category <span class="req">*</span></label>
+          <select id="fCat">
+            <option value="">— Select —</option>
+            <option>Fiction</option><option>Non-Fiction</option><option>Science</option>
+            <option>Technology</option><option>Mathematics</option><option>History</option>
+            <option>Biography</option><option>Philosophy</option><option>Arts</option><option>Other</option>
+          </select>
+        </div>
+        <div class="fg"><label>Quantity <span class="req">*</span></label><input type="number" id="fQty" min="1" placeholder="e.g. 5"/></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" id="mCancel">Cancel</button>
+      <button class="btn btn-primary" id="mSave"><i class="fa-solid fa-floppy-disk"></i> Save Book</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DELETE MODAL ── -->
+<div class="overlay" id="delOverlay">
+  <div class="modal modal-sm">
+    <div class="modal-head danger">
+      <h3><i class="fa-solid fa-triangle-exclamation"></i> Delete Book</h3>
+      <button class="mclose" id="dClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete <strong id="dName"></strong>? This action cannot be undone.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" id="dCancel">Cancel</button>
+      <button class="btn btn-danger" id="dConfirm"><i class="fa-solid fa-trash"></i> Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── UTILS ── */
+const $  = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const uid = () => '_'+Math.random().toString(36).slice(2,9);
+const ts  = () => new Date().toLocaleString('en-IN',{dateStyle:'short',timeStyle:'short'});
+
+/* ── STORAGE ── */
+const getBooks = () => JSON.parse(localStorage.getItem('lf2_books')||'[]');
+const setBooks = d => localStorage.setItem('lf2_books',JSON.stringify(d));
+const getLog   = () => JSON.parse(localStorage.getItem('lf2_log')||'[]');
+const setLog   = d => localStorage.setItem('lf2_log',JSON.stringify(d));
+
+function addLog(msg,type){
+  const log = getLog();
+  log.unshift({msg,type,time:ts()});
+  if(log.length>40)log.pop();
+  setLog(log);
+}
+
+/* ── DEMO SEED ── */
+function seed(){
+  if(localStorage.getItem('lf2_seeded'))return;
+  setBooks([
+    {id:uid(),title:'Clean Code',author:'Robert C. Martin',category:'Technology',qty:5,issued:1},
+    {id:uid(),title:'The Great Gatsby',author:'F. Scott Fitzgerald',category:'Fiction',qty:4,issued:0},
+    {id:uid(),title:'Sapiens',author:'Yuval Noah Harari',category:'History',qty:3,issued:2},
+    {id:uid(),title:'A Brief History of Time',author:'Stephen Hawking',category:'Science',qty:2,issued:0},
+    {id:uid(),title:'The Alchemist',author:'Paulo Coelho',category:'Fiction',qty:6,issued:3},
+    {id:uid(),title:'Thinking, Fast and Slow',author:'Daniel Kahneman',category:'Philosophy',qty:3,issued:1},
+    {id:uid(),title:'Introduction to Algorithms',author:'Thomas H. Cormen',category:'Technology',qty:4,issued:2},
+    {id:uid(),title:'To Kill a Mockingbird',author:'Harper Lee',category:'Fiction',qty:5,issued:0},
+  ]);
+  addLog('Demo data loaded — welcome!','add');
+  localStorage.setItem('lf2_seeded','1');
+}
+
+/* ── TOAST ── */
+function toast(msg,type='success'){
+  const t=$('toast'),ic=$('tIcon');
+  const map={success:{icon:'fa-circle-check',cls:'t-success'},error:{icon:'fa-circle-xmark',cls:'t-error'},warn:{icon:'fa-triangle-exclamation',cls:'t-warn'}};
+  const m=map[type]||map.success;
+  t.className=`toast ${m.cls}`;
+  ic.className=`fa-solid ${m.icon} toast-icon`;
+  $('tMsg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ── NAVIGATION ── */
+let curPage='home';
+function nav(page){
+  curPage=page;
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${page}`));
+  const titles={home:'Home',dashboard:'Dashboard',books:'Books',issue:'Issue / Return'};
+  $('topbarTitle').textContent=titles[page]||page;
+  if(page==='dashboard')renderDash();
+  if(page==='books')renderBooks();
+  if(page==='issue')renderIssue();
+  closeSidebar();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.page)));
+
+/* ── SIDEBAR MOBILE ── */
+function closeSidebar(){
+  $('sidebar').classList.remove('open');
+  $('sidebarOverlay').classList.remove('open');
+}
+$('menuToggle').addEventListener('click',()=>{
+  $('sidebar').classList.toggle('open');
+  $('sidebarOverlay').classList.toggle('open');
+});
+$('sidebarOverlay').addEventListener('click',closeSidebar);
+
+/* ── DASHBOARD ── */
+function renderDash(){
+  const bks=getBooks();
+  const titles=bks.length;
+  const copies=bks.reduce((s,b)=>s+b.qty,0);
+  const issued=bks.reduce((s,b)=>s+b.issued,0);
+  const avail=copies-issued;
+  $('stTotal').textContent=titles;
+  $('stCopies').textContent=copies;
+  $('stIssued').textContent=issued;
+  $('stAvail').textContent=avail;
+
+  // categories
+  const cats={};
+  bks.forEach(b=>{cats[b.category]=(cats[b.category]||0)+1});
+  const mx=Math.max(...Object.values(cats),1);
+  $('catList').innerHTML=Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`
+    <div class="cat-item">
+      <span class="cat-name">${esc(n)}</span>
+      <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${(c/mx*100).toFixed(0)}%"></div></div>
+      <span class="cat-num">${c}</span>
+    </div>`).join('')||'<p class="no-data">No books yet.</p>';
+
+  // activity
+  const log=getLog();
+  const dmap={add:'ad-add',delete:'ad-del',edit:'ad-edit',issue:'ad-issue',return:'ad-return'};
+  $('actLog').innerHTML=log.map(e=>`
+    <div class="activity-item">
+      <div class="act-dot ${dmap[e.type]||'ad-add'}"></div>
+      <span class="act-msg">${esc(e.msg)}</span>
+      <span class="act-time">${e.time}</span>
+    </div>`).join('')||'<p class="no-data">No activity yet.</p>';
+}
+
+/* ── BOOKS ── */
+let activeCat='all', srchQ='';
+
+function renderBooks(){
+  const bks=getBooks();
+  renderPills(bks);
+  applyFilter(bks);
+}
+
+function renderPills(bks){
+  const cats=['all',...new Set(bks.map(b=>b.category))];
+  $('pills').innerHTML=cats.map(c=>`<button class="pill${c===activeCat?' active':''}" data-cat="${c}">${c==='all'?'All':c}</button>`).join('');
+  $('pills').querySelectorAll('.pill').forEach(p=>p.addEventListener('click',()=>{
+    activeCat=p.dataset.cat;
+    $('pills').querySelectorAll('.pill').forEach(x=>x.classList.toggle('active',x===p));
+    applyFilter(getBooks());
+  }));
+}
+
+function applyFilter(bks){
+  let f=bks;
+  if(activeCat!=='all')f=f.filter(b=>b.category===activeCat);
+  if(srchQ){const q=srchQ.toLowerCase();f=f.filter(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q))}
+  renderBTbl(f);
+}
+
+function renderBTbl(bks){
+  const tbl=$('booksWrap').querySelector('table');
+  const empty=$('bEmpty');
+  if(!bks.length){tbl.style.display='none';empty.style.display='block';return}
+  tbl.style.display='';empty.style.display='none';
+  $('bTbody').innerHTML=bks.map((b,i)=>{
+    const av=b.qty-b.issued;
+    const bdg=av>0&&b.issued===0?`<span class="badge bdg-ok"><i class="fa-solid fa-circle-check"></i> Available</span>`:
+      av>0?`<span class="badge bdg-partial"><i class="fa-solid fa-rotate"></i> Partial</span>`:
+      `<span class="badge bdg-none"><i class="fa-solid fa-circle-xmark"></i> All Issued</span>`;
+    return`<tr>
+      <td><span style="color:var(--text3);font-size:.8rem">${i+1}</span></td>
+      <td class="td-title">${esc(b.title)}</td>
+      <td class="td-author">${esc(b.author)}</td>
+      <td><span style="background:var(--bg);padding:3px 10px;border-radius:50px;font-size:.75rem;font-weight:600;color:var(--text2)">${esc(b.category)}</span></td>
+      <td class="td-num">${b.qty}</td>
+      <td class="td-num ${av>0?'num-avail':'num-none'}">${av}</td>
+      <td>${bdg}</td>
+      <td><div class="btns">
+        <button class="ibtn ibtn-edit" title="Edit" onclick="openEdit('${b.id}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="ibtn ibtn-del"  title="Delete" onclick="openDel('${b.id}','${esc(b.title)}')"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// Search
+$('srch').addEventListener('input',function(){
+  srchQ=this.value.trim();
+  $('srchClear').classList.toggle('vis',!!srchQ);
+  applyFilter(getBooks());
+});
+$('srchClear').addEventListener('click',()=>{
+  $('srch').value='';srchQ='';
+  $('srchClear').classList.remove('vis');
+  applyFilter(getBooks());
+});
+
+/* ── ISSUE/RETURN ── */
+function renderIssue(q=''){
+  let bks=getBooks();
+  if(q){const qr=q.toLowerCase();bks=bks.filter(b=>b.title.toLowerCase().includes(qr)||b.author.toLowerCase().includes(qr))}
+  const empty=$('iEmpty');
+  const tbl=$('iTbody').closest('table');
+  if(!bks.length){tbl.style.display='none';empty.style.display='block';return}
+  tbl.style.display='';empty.style.display='none';
+  $('iTbody').innerHTML=bks.map((b,i)=>{
+    const av=b.qty-b.issued;
+    const ci=av>0;const cr=b.issued>0;
+    return`<tr>
+      <td><span style="color:var(--text3);font-size:.8rem">${i+1}</span></td>
+      <td class="td-title">${esc(b.title)}</td>
+      <td class="td-author">${esc(b.author)}</td>
+      <td>${esc(b.category)}</td>
+      <td class="td-num ${av>0?'num-avail':'num-none'}">${av}</td>
+      <td class="td-num ${b.issued>0?'num-issue':''}  ">${b.issued}</td>
+      <td><div class="btns">
+        <button class="ibtn ibtn-issue" title="Issue one copy" ${ci?'':'disabled style="opacity:.35;cursor:not-allowed"'} onclick="issueBook('${b.id}')"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+        <button class="ibtn ibtn-return" title="Return one copy" ${cr?'':'disabled style="opacity:.35;cursor:not-allowed"'} onclick="returnBook('${b.id}')"><i class="fa-solid fa-rotate-left"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+$('isrch').addEventListener('input',function(){renderIssue(this.value.trim())});
+
+function issueBook(id){
+  const bks=getBooks(),b=bks.find(x=>x.id===id);
+  if(!b||b.issued>=b.qty){toast('No copies available!','error');return}
+  b.issued++;setBooks(bks);addLog(`Issued 1 copy of "${b.title}"`,'issue');
+  toast(`1 copy of "${b.title}" issued.`);
+  renderIssue($('isrch').value.trim());
+}
+function returnBook(id){
+  const bks=getBooks(),b=bks.find(x=>x.id===id);
+  if(!b||b.issued<=0){toast('No issued copies to return!','error');return}
+  b.issued--;setBooks(bks);addLog(`Returned 1 copy of "${b.title}"`,'return');
+  toast(`"${b.title}" returned successfully.`);
+  renderIssue($('isrch').value.trim());
+}
+
+/* ── MODALS ── */
+function openM(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
+function closeM(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
+['bookOverlay','delOverlay'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeM(id)});
+});
+
+// Add book
+function openAdd(){
+  $('mTitle').textContent='Add New Book';
+  $('editId').value='';
+  ['fTitle','fAuthor','fQty'].forEach(x=>{$(x).value='';$(x).classList.remove('err')});
+  $('fCat').value='';$('fCat').classList.remove('err');
+  openM('bookOverlay');
+}
+$('openAdd').addEventListener('click',openAdd);
+$('emptyAdd').addEventListener('click',openAdd);
+$('mClose').addEventListener('click',()=>closeM('bookOverlay'));
+$('mCancel').addEventListener('click',()=>closeM('bookOverlay'));
+
+// Edit book
+function openEdit(id){
+  const b=getBooks().find(x=>x.id===id);if(!b)return;
+  $('mTitle').textContent='Edit Book';
+  $('editId').value=id;
+  $('fTitle').value=b.title;$('fAuthor').value=b.author;
+  $('fCat').value=b.category;$('fQty').value=b.qty;
+  ['fTitle','fAuthor','fCat','fQty'].forEach(x=>$(x).classList.remove('err'));
+  openM('bookOverlay');
+}
+
+// Save
+$('mSave').addEventListener('click',()=>{
+  const title=$('fTitle').value.trim(),author=$('fAuthor').value.trim();
+  const cat=$('fCat').value,qty=parseInt($('fQty').value);
+  let ok=true;
+  const vld=(id,cond)=>{$(id).classList.toggle('err',!cond);if(!cond)ok=false};
+  vld('fTitle',!!title);vld('fAuthor',!!author);vld('fCat',!!cat);vld('fQty',!isNaN(qty)&&qty>=1);
+  if(!ok){toast('Please fill all required fields.','error');return}
+  const bks=getBooks();
+  const eid=$('editId').value;
+  if(eid){
+    const idx=bks.findIndex(b=>b.id===eid);if(idx===-1)return;
+    const old=bks[idx];
+    bks[idx]={...old,title,author,category:cat,qty,issued:Math.min(old.issued,qty)};
+    setBooks(bks);addLog(`Edited "${title}"`,'edit');toast(`"${title}" updated!`);
+  }else{
+    bks.push({id:uid(),title,author,category:cat,qty,issued:0});
+    setBooks(bks);addLog(`Added "${title}" by ${author}`,'add');toast(`"${title}" added to library!`);
+  }
+  closeM('bookOverlay');renderBooks();
+});
+
+// Delete
+let delId=null;
+function openDel(id,name){
+  delId=id;$('dName').textContent=name;openM('delOverlay');
+}
+$('dClose').addEventListener('click',()=>closeM('delOverlay'));
+$('dCancel').addEventListener('click',()=>closeM('delOverlay'));
+$('dConfirm').addEventListener('click',()=>{
+  if(!delId)return;
+  const bks=getBooks(),b=bks.find(x=>x.id===delId);if(!b)return;
+  setBooks(bks.filter(x=>x.id!==delId));
+  addLog(`Deleted "${b.title}"`,'delete');
+  toast(`"${b.title}" removed.`,'warn');
+  closeM('delOverlay');renderBooks();delId=null;
+});
+
+// Inline nav for home buttons
+document.querySelectorAll('[onclick]');
+
+/* ── INIT ── */
+seed();
+nav('home');
+</script>
+</body>
+</html>
